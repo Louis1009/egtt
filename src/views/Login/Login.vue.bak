@@ -1,0 +1,175 @@
+<template>
+  <div class="login">
+
+    <div class="login-zhuce">
+      <router-link to="/register">注册</router-link>
+    </div>
+    <div class="login-title">
+      <div>
+        <img data-v-01e7f602="" src="http://jsgj.sls4741.store/image/logo.png" alt="">
+        嘉盛国际
+      </div>
+      <p style="color: rgb(173, 173, 173); font-size: 16px;">嘉盛国际·智能交易系统</p></div>
+    <form>
+      <div class="form-item">
+        <group>
+          <x-input name="mobile" required v-model="loginForm.phone" placeholder="请输入手机号码" keyboard="number"
+                   is-type="china-mobile"></x-input>
+        </group>
+        <group>
+          <x-input name="password" required v-model="loginForm.passWord" placeholder="请输入密码" type="password"></x-input>
+        </group>
+      </div>
+
+      <div style="margin: 0px auto; width: 90%;">
+        <x-button type="warn" action-type="button" @click.native="login()"
+                  style="background: linear-gradient(90deg, rgb(9, 120, 200), rgb(27, 178, 221)); color: rgb(255, 255, 255); border-radius: 99px;">
+          登录
+        </x-button>
+      </div>
+      <div data-v-01e7f602="" class="forget" style="margin: 10px 20px;">
+        <router-link to="/forgetPassword">忘记密码</router-link>
+      </div>
+    </form>
+    <div class="login-bottom">
+      <img src="http://jsgj.sls4741.store/image/login_bottom.png" style="width: 100%;">
+    </div>
+  </div>
+</template>
+<script>
+  import {XInput, XButton, AlertModule} from 'vux'
+  import qs from 'Qs'
+
+  const username = '';
+  export default {
+    name: "Login",
+    components: {
+      XInput,
+      XButton, AlertModule
+    },
+    data() {
+      return {
+        loginForm: {
+          phone: '',
+          passWord: ''
+        },
+
+      }
+    },
+    methods: {
+      login() {
+        let _this = this;
+
+        if (_this.loginForm.phone === '' || _this.loginForm.passWord === '') {
+          AlertModule.show({
+            title: '信息',
+            content: "请填写完整信息"
+          })
+        } else {
+          this.axios.post('http://45.112.205.186/futuresMember/login', qs.stringify(_this.loginForm))
+            .then(res => {
+              console.log(res.data["data"]);
+              if (res.data["code"] == 1) {
+
+                let user = {
+                  id: res.data["data"]["id"],
+                  username: res.data["data"]["username"],
+                  sealingMoney: res.data["data"]["accountBalance"],
+                  phone: res.data["data"]["phone"],
+                  isLogin: true
+                }
+                window.localStorage.setItem("user", JSON.stringify(user))
+                _this.$router.push('/frame');
+                console.log(this.$parent.user.id);
+                console.log(this.$parent.user);
+              } else {
+                AlertModule.show({
+                  title: '信息',
+                  content: res.data["message"]
+                })
+              }
+            }).catch(error => {
+            AlertModule.show({
+              title: '信息',
+              content: error
+            })
+          });
+        }
+
+      }
+    }
+  }
+</script>
+
+<style scoped>
+
+  .login.router-view {
+    background: #fff;
+    height: 100%;
+    overflow: hidden;
+    top: 0px;
+  }
+
+  .login-zhuce {
+    text-align: right;
+    margin: 20px;
+  }
+
+  .login-zhuce a {
+    font-weight: bold;
+    font-size: 16px;
+    color: #000;
+  }
+
+  .login-title {
+    text-align: center;
+    font-size: 26px;
+  }
+
+  .login-title img {
+    width: 45px;
+    height: 45px;
+    vertical-align: middle;
+  }
+
+  .form-item {
+    margin: 70px 0 50px 0;
+  }
+
+
+  .form-item /deep/ .weui-cells.vux-no-group-title {
+    width: 85%;
+    margin: 30px auto;
+    border-radius: 100px;
+    border: 1px solid #e8e8e8;
+  }
+
+  .form-item /deep/ .weui-cells:before {
+    border-top: none;
+  }
+
+  .form-item /deep/ .weui-cells:after {
+    border-bottom: none;
+  }
+
+  .form-item .weui-btn {
+    background: #fff;
+    color: #000;
+    font-weight: normal;
+  }
+
+  .form-item .weui-btn:after {
+    border: none;
+  }
+
+  .forget[data-v-01e7f602] {
+    text-align: center;
+  }
+
+  a {
+    font-size: 12px;
+    color: #838383;
+    text-decoration: none;
+    -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+  }
+</style>
